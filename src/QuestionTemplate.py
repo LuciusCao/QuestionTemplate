@@ -3,5 +3,5 @@ class QuestionTemplate:
         self.name = name
 
     def generate(self):
-        pass
+        print("success {}".format(self.name))
 
