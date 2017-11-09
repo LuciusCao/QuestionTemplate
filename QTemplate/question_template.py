@@ -61,11 +61,13 @@ class QuestionTemplate:
         template_with_data = template_wo_data.format(*calced_expressions)
         return template_with_data
 
-    def _parse_expressions(self, content):
+    @staticmethod
+    def _parse_expressions(content):
         pattern = r'(?<=<).+?(?=>)+?'
         return re.findall(pattern, content)
 
-    def _parse_template(self, content):
+    @staticmethod
+    def _parse_template(content):
         pattern = r'(<.+?>)+?'
         replacement = '{}'
         return re.sub(pattern, replacement, content)
