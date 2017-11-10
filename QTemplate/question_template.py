@@ -63,12 +63,12 @@ class QuestionTemplate:
 
     @staticmethod
     def _parse_expressions(content):
-        pattern = r'(?<=<).+?(?=>)+?'
+        pattern = r'(?<=<)[^<]+?(?=>)'
         return re.findall(pattern, content)
 
     @staticmethod
     def _parse_template(content):
-        pattern = r'(<.+?>)+?'
+        pattern = r'<[^<]+?>'
         replacement = '{}'
         return re.sub(pattern, replacement, content)
 
