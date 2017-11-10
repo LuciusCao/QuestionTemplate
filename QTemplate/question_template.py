@@ -34,7 +34,10 @@ class QuestionTemplate:
             variables[var_name] = self._parse_rule(rule)
         return variables
 
-    def _parse_rule(self, rule):
+    def _parse_rule(self, rule, random_state=None):
+        if random_state is not None:
+            random.seed(random_state)
+
         tokens = rule.split()
         d_type = 'int'
         if 'float' in tokens:
