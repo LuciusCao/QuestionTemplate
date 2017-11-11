@@ -34,7 +34,8 @@ class QuestionTemplate:
             variables[var_name] = self._parse_rule(rule)
         return variables
 
-    def _parse_rule(self, rule, random_state=None):
+    @staticmethod
+    def _parse_rule(rule, random_state=None):
         if random_state is not None:
             random.seed(random_state)
 
@@ -43,19 +44,13 @@ class QuestionTemplate:
         if 'float' in tokens:
             d_type = 'float'
 
-        use_random = 'random'
-        if use_random:
-            assert 'from' in tokens and 'to' in tokens
-            floor = int(re.findall(r'(?<=from).(\d+)', rule)[0])
-            ceil = int(re.findall(r'(?<=to).(\d+)', rule)[0])
-            if d_type == 'int':
-                return random.randint(floor, ceil)
-            else:
-                return random.random * (ceil - floor) + floor
-
+        assert 'from' in tokens and 'to' in tokens
+        floor = int(re.findall(r'(?<=from).(\d+)', rule)[0])
+        ceil = int(re.findall(r'(?<=to).(\d+)', rule)[0])
+        if d_type == 'int':
+            return random.randint(floor, ceil)
         else:
-            number = re.findall(r'\d+', rule)[0]
-            return eval('{}({})'.format(d_type, number))
+            return random.random() * (ceil - floor) + floor
 
     def _inject_data_to_template(self, content):
         expressions = self._parse_expressions(content)
