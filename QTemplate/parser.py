@@ -109,3 +109,5 @@ def roll(list_of_number):
 def check_interval(floor, ceil):
     if ceil < floor:
         raise Exception('取值范围{}到{}错误'.format(floor, ceil))
+    else:
+        pass
