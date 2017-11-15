@@ -46,7 +46,7 @@ def run_syntax(cmd, random_state=None):
 
     elif cmd.data == 'prime':
         args = cmd.children
-        return generate_prime(args)
+        return roll(generate_prime_list(args))
 
     else:
         raise Exception('未知指令')
@@ -79,7 +79,7 @@ def generate_fraction(args):
     return Fraction(numerator, denominator)
 
 
-def generate_prime(args):
+def generate_prime_list(args):
     floor = int(args[0])
     ceil = int(args[1])
 
@@ -87,18 +87,23 @@ def generate_prime(args):
         floor = 2
 
     check_interval(floor, ceil)
-    prime = [i for i in range(floor, ceil+1)]
+    prime_list = [i for i in range(floor, ceil+1)]
 
-    for num in prime:
+    for num in prime_list:
         for i in range(2, num):
             if num % i == 0:
-                prime.remove(num)
+                prime_list.remove(num)
                 break
 
-    if len(prime) == 0:
+    if len(prime_list) == 0:
         raise Exception('{}到{}范围内没有质数'.format(floor, ceil))
 
-    return prime
+    return prime_list
+
+
+def roll(list_of_number):
+    random.shuffle(list_of_number)
+    return list_of_number.pop()
 
 
 def check_interval(floor, ceil):
