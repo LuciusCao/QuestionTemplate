@@ -38,4 +38,7 @@ class OperandSolver:
             if eval(expression) == self.target:
                 solutions.append([s for s in solution])
 
+        if self.use_parenthesis is True:
+            pass  # TODO
+
         return solutions
