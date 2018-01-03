@@ -51,34 +51,32 @@ class OperandSolver:
         else:
             return False
 
-    def solve(self):
+    @staticmethod
+    def _solver(formula, ops, target):
         expressions = set()
-        formula = '{}'.join(self.numbers)
-        num_blanks = len(self.numbers) - 1
-        possible_solutions = product(self.operands, repeat=num_blanks)
+        num_blanks = len(re.findall(r'{}', formula))
+        possible_solutions = product(ops, repeat=num_blanks)
 
         for solution in possible_solutions:
             expr = formula.format(*solution)
-            if eval(expr) == self.target:
-                expressions.add(expr)
+            try:
+                if eval(expr) == target:
+                    if OperandSolver._expr_validation(expr):
+                        expressions.add(expr)
+            except Exception:
+                pass
+
+        return expressions
+
+    def solve(self):
+        formula = '{}'.join(self.numbers)
+        expressions = OperandSolver._solver(formula, self.operands, self.target)
 
         if self.use_parenthesis is False:
             return expressions
         else:
             formulas = OperandSolver._add_curly_brace_to_all(expressions)
-            expressions = set()
             for f in formulas:
                 ops = {'(', ')', ''}
-                num_blanks = len(re.findall(r'{}', f))
-                possible_solutions = product(ops, repeat=num_blanks)
-
-                for solution in possible_solutions:
-                    expr = f.format(*solution)
-                    try:
-                        if eval(expr) == self.target:
-                            if OperandSolver._expr_validation(expr):
-                                expressions.add(expr)
-                    except Exception:
-                        pass
-
+                expressions = OperandSolver._solver(f, ops, self.target)
             return expressions

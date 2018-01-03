@@ -61,6 +61,16 @@ def test_expr_validation(test_input, expected):
     assert OperandSolver._expr_validation(test_input) == expected
 
 
+@pytest.mark.parametrize('formula, ops, target, expected', [
+    ('1{}2', {'+', '-', ''}, 3, {'1+2'}),
+    ('1{}2{}3', {'+', '-', ''}, 9, {'12-3'}),
+    ('{}1{}+{}2{}+{}3{}', {'(', ')', ''}, 6, {'1+2+3', '(1+2)+3',
+                                              '1+(2+3)', '(1+2+3)'})
+])
+def test_solver(formula, ops, target, expected):
+    assert OperandSolver._solver(formula, ops, target) == expected
+
+
 @pytest.mark.parametrize('test_input, expected', [
     (([1, 2, 3], 6, False, False), {'1+2+3'}),
     (([1, 2, 3], 15, True, False), {'12+3'}),
