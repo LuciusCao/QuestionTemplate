@@ -8,19 +8,37 @@ from QTemplate.solver.operand_solver import OperandSolver
     ((True, False), ['+', '-', '']),
 ])
 def test_initialization(test_input, expected):
-    op_solver = OperandSolver(formula=0,
-                              target=0,
+    op_solver = OperandSolver(formula=[1, 2],
+                              target=3,
                               allow_empty=test_input[0],
                               use_parenthesis=test_input[1])
-    assert op_solver.operand == expected
+    assert op_solver.operands == expected
 
-def test_initialization_fail():
+
+def test_initialization_fail_with_no_data():
     with pytest.raises(Exception):
         OperandSolver()
 
 
+@pytest.mark.parametrize('formula, target', [
+    (1, 1),
+    ([1, 2], None),
+])
+def test_initialization_fail_with_wrong_data(formula, target):
+    with pytest.raises(Exception):
+        OperandSolver(formula=formula, target=target)
+
+
 @pytest.mark.parametrize('test_input, expected', [
-    (15, ['15']),
+    ('6', '{}6{}'),
+    ('1+2', '{}1{}+{}2{}'),
+    ('1+2-3', '{}1{}+{}2{}-{}3{}')
+])
+def test_add_curly_brace_to_one(test_input, expected):
+    assert OperandSolver._add_curly_brace_to_one(test_input) == expected
+
+
+@pytest.mark.parametrize('test_input, expected', [
     ([1, 2, 3], ['1', '2', '3']),
     (['1', 2, 3], ['1', '2', '3'])
 ])
@@ -30,15 +48,25 @@ def test_convert_data(test_input, expected):
 
 def test_convert_data_fail():
     with pytest.raises(Exception):
-        OperandSolver._convert_data({1:2})
+        OperandSolver._convert_data({1: 2})
 
 
 @pytest.mark.parametrize('test_input, expected', [
-    ((6, 6, False, False), [[]]),
-    (([1, 2, 3], 6, False, False), [['+', '+']]),
-    (([1, 2, 3], 15, True, False), [['', '+']]),
+    ('(1+2)', True),
+    ('(1)+2', False),
+    ('1+2', True),
+    ('()', False)
+])
+def test_expr_validation(test_input, expected):
+    assert OperandSolver._expr_validation(test_input) == expected
+
+
+@pytest.mark.parametrize('test_input, expected', [
+    (([1, 2, 3], 6, False, False), ['1+2+3']),
+    (([1, 2, 3], 15, True, False), ['12+3']),
     (([1, 2, 3], 9, False, False), []),
-    (([1, 2, 3], 9, True, True), [['', '-']])
+    (([1, 2, 3], 9, True, False), ['12-3']),
+    (([1, 2], 3, True, True), ['1+2', '(1+2)'])
 ])
 def test_solve(test_input, expected):
     op_solver = OperandSolver(formula=test_input[0],
