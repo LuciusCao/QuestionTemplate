@@ -8,7 +8,7 @@ from QTemplate.solver.operand_solver import OperandSolver
     ((True, False), {'+', '-', ''}),
 ])
 def test_initialization(test_input, expected):
-    op_solver = OperandSolver(formula=[1, 2],
+    op_solver = OperandSolver(numbers=[1, 2],
                               target=3,
                               allow_empty=test_input[0],
                               use_parenthesis=test_input[1])
@@ -20,13 +20,13 @@ def test_initialization_fail_with_no_data():
         OperandSolver()
 
 
-@pytest.mark.parametrize('formula, target', [
+@pytest.mark.parametrize('numbers, target', [
     (1, 1),
     ([1, 2], None),
 ])
-def test_initialization_fail_with_wrong_data(formula, target):
+def test_initialization_fail_with_wrong_data(numbers, target):
     with pytest.raises(Exception):
-        OperandSolver(formula=formula, target=target)
+        OperandSolver(numbers=numbers, target=target)
 
 
 @pytest.mark.parametrize('test_input, expected', [
@@ -69,7 +69,7 @@ def test_expr_validation(test_input, expected):
     (([1, 2], 3, True, True), {'1+2', '(1+2)'})
 ])
 def test_solve(test_input, expected):
-    op_solver = OperandSolver(formula=test_input[0],
+    op_solver = OperandSolver(numbers=test_input[0],
                               target=test_input[1],
                               allow_empty=test_input[2],
                               use_parenthesis=test_input[3])

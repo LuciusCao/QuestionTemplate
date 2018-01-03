@@ -5,15 +5,15 @@ from itertools import product
 
 class OperandSolver:
     def __init__(self,
-                 formula=None,
+                 numbers=None,
                  target=None,
                  allow_empty=False,
                  use_parenthesis=False):
 
-        if formula is None or target is None:
+        if numbers is None or target is None:
             raise Exception('必须指定等式左右两侧')
 
-        if isinstance(formula, list) and len(formula) == 1:
+        if isinstance(numbers, list) and len(numbers) == 1:
             raise Exception('必须由超过一个数组成的列表')
 
         self.use_parenthesis = use_parenthesis
@@ -22,7 +22,7 @@ class OperandSolver:
         if allow_empty is True:
             self.operands.add('')
 
-        self.formula = self._convert_data(formula)
+        self.numbers = self._convert_data(numbers)
         self.target = target
 
     @staticmethod
@@ -53,8 +53,8 @@ class OperandSolver:
 
     def solve(self):
         expressions = set()
-        formula = '{}'.join(self.formula)
-        num_blanks = len(self.formula) - 1
+        formula = '{}'.join(self.numbers)
+        num_blanks = len(self.numbers) - 1
         possible_solutions = product(self.operands, repeat=num_blanks)
 
         for solution in possible_solutions:
@@ -82,4 +82,3 @@ class OperandSolver:
                         pass
 
             return expressions
-
