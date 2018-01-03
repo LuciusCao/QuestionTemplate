@@ -18,9 +18,9 @@ class OperandSolver:
 
         self.use_parenthesis = use_parenthesis
 
-        self.operands = ['+', '-']
+        self.operands = {'+', '-'}
         if allow_empty is True:
-            self.operands.append('')
+            self.operands.add('')
 
         self.formula = self._convert_data(formula)
         self.target = target
@@ -52,7 +52,7 @@ class OperandSolver:
             return False
 
     def solve(self):
-        expressions = []
+        expressions = set()
         formula = '{}'.join(self.formula)
         num_blanks = len(self.formula) - 1
         possible_solutions = product(self.operands, repeat=num_blanks)
@@ -60,15 +60,15 @@ class OperandSolver:
         for solution in possible_solutions:
             expr = formula.format(*solution)
             if eval(expr) == self.target:
-                expressions.append(expr)
+                expressions.add(expr)
 
         if self.use_parenthesis is False:
             return expressions
         else:
             formulas = OperandSolver._add_curly_brace_to_all(expressions)
-            expressions = []
+            expressions = set()
             for f in formulas:
-                ops = ['(', ')', '']
+                ops = {'(', ')', ''}
                 num_blanks = len(re.findall(r'{}', f))
                 possible_solutions = product(ops, repeat=num_blanks)
 
@@ -77,7 +77,7 @@ class OperandSolver:
                     try:
                         if eval(expr) == self.target:
                             if OperandSolver._expr_validation(expr):
-                                expressions.append(expr)
+                                expressions.add(expr)
                     except Exception:
                         pass
 

@@ -4,8 +4,8 @@ from QTemplate.solver.operand_solver import OperandSolver
 
 
 @pytest.mark.parametrize('test_input, expected', [
-    ((False, False), ['+', '-']),
-    ((True, False), ['+', '-', '']),
+    ((False, False), {'+', '-'}),
+    ((True, False), {'+', '-', ''}),
 ])
 def test_initialization(test_input, expected):
     op_solver = OperandSolver(formula=[1, 2],
@@ -62,11 +62,11 @@ def test_expr_validation(test_input, expected):
 
 
 @pytest.mark.parametrize('test_input, expected', [
-    (([1, 2, 3], 6, False, False), ['1+2+3']),
-    (([1, 2, 3], 15, True, False), ['12+3']),
-    (([1, 2, 3], 9, False, False), []),
-    (([1, 2, 3], 9, True, False), ['12-3']),
-    (([1, 2], 3, True, True), ['1+2', '(1+2)'])
+    (([1, 2, 3], 6, False, False), {'1+2+3'}),
+    (([1, 2, 3], 15, True, False), {'12+3'}),
+    (([1, 2, 3], 9, False, False), set()),
+    (([1, 2, 3], 9, True, False), {'12-3'}),
+    (([1, 2], 3, True, True), {'1+2', '(1+2)'})
 ])
 def test_solve(test_input, expected):
     op_solver = OperandSolver(formula=test_input[0],
