@@ -55,7 +55,8 @@ def test_convert_data_fail():
     ('(1+2)', True),
     ('(1)+2', False),
     ('1+2', True),
-    ('()', False)
+    ('()', False),
+    ('(45-(20)+8)', False)
 ])
 def test_expr_validation(test_input, expected):
     assert OperandSolver._expr_validation(test_input) == expected
