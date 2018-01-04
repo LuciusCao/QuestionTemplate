@@ -45,11 +45,15 @@ class OperandSolver:
 
     @staticmethod
     def _expr_validation(expr):
-        result = re.findall(r'\(\d{0,1}\)', expr)
+        result = re.findall(r'\(\d*?\)', expr)
         if len(result) == 0:
             return True
         else:
             return False
+
+    @staticmethod
+    def _sign_checker(expr):
+        pass  # TODO
 
     @staticmethod
     def _solver(formula, ops, target):
