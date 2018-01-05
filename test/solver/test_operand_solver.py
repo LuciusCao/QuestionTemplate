@@ -85,3 +85,10 @@ def test_solve(test_input, expected):
                               allow_empty=test_input[2],
                               use_parenthesis=test_input[3])
     assert op_solver.solve() == expected
+
+
+@pytest.mark.parametrize('sign_list, expected', [
+    (['-', '(', '-', ')'], ['-', '(', '+', ')']),
+])
+def test_fix_sign(sign_list, expected):
+    assert OperandSolver._fix_sign(sign_list) == expected
