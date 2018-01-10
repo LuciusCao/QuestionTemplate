@@ -52,6 +52,49 @@ class MatchGameSolver:
             }
         }
 
-        @staticmethod
-        def _extract_number_from_question(question):
-            return re.findall(r'\d')
+    @staticmethod
+    def _extract_numbers_from_question(question):
+        return re.findall(r'[\d\+\-]', question)
+
+    @staticmethod
+    def _replace_with_curly_brace(question):
+        return re.subn(r'[\d\+\-]', '{}', question)[0]
+
+    @staticmethod
+    def _get_question_and_key(question):
+        return question.split('=')
+
+    def _solve_for_add_one(self, question):
+        expr = MatchGameSolver._replace_with_curly_brace(question)
+        digit_list = MatchGameSolver._extract_numbers_from_question(question)
+        solutions = set()
+        length = len(digit_list)
+
+        for i in range(length):
+            digit = digit_list[i]
+            try:
+                possible_moves = self.lookup_table['add_one'][digit]
+            except KeyError:
+                break
+
+            for move in possible_moves:
+                new_digit_list = digit_list.copy()
+                new_digit_list[i] = move
+                new_expr = expr.format(*new_digit_list)
+
+            splited = MatchGameSolver._get_question_and_key(new_expr)
+            left = splited[0]
+            right = splited[1]
+            if eval(left) == eval(right):
+                solutions.add(expr)
+
+        return solutions
+
+    def solve(self):
+        if self.mode == '+' and self.num_moves == 1:
+            solutions = self._solve_for_add_one(self.question)
+        return solutions
+
+    def output(self):
+        solutions = self.solve()
+        print(' | '.join(solutions))
