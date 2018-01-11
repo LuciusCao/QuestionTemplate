@@ -64,6 +64,17 @@ class MatchGameSolver:
     def _get_question_and_key(question):
         return question.split('=')
 
+    @staticmethod
+    def _judge_expression(expr):
+        splited = MatchGameSolver._get_question_and_key(expr)
+        left = splited[0]
+        right = splited[1]
+
+        if eval(left) == eval(right):
+            return True
+        else:
+            return False
+
     def _solve_for_add_one(self, question):
         expr = MatchGameSolver._replace_with_curly_brace(question)
         digit_list = MatchGameSolver._extract_numbers_from_question(question)
@@ -74,19 +85,14 @@ class MatchGameSolver:
             digit = digit_list[i]
             try:
                 possible_moves = self.lookup_table['add_one'][digit]
+                for move in possible_moves:
+                    new_digit_list = digit_list.copy()
+                    new_digit_list[i] = move
+                    new_expr = expr.format(*new_digit_list)
+                    if MatchGameSolver._judge_expression(new_expr):
+                        solutions.add(new_expr)
             except KeyError:
-                break
-
-            for move in possible_moves:
-                new_digit_list = digit_list.copy()
-                new_digit_list[i] = move
-                new_expr = expr.format(*new_digit_list)
-
-            splited = MatchGameSolver._get_question_and_key(new_expr)
-            left = splited[0]
-            right = splited[1]
-            if eval(left) == eval(right):
-                solutions.add(expr)
+                pass
 
         return solutions
 

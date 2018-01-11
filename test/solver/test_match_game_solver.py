@@ -5,7 +5,8 @@ from QTemplate.solver.match_game_solver import MatchGameSolver
 
 @pytest.mark.parametrize('question, expected', [
     ('1+2=3', ['1', '+', '2', '3']),
-    ('1-2-2=3', ['1', '-', '2', '-', '2', '3'])
+    ('1-2-2=3', ['1', '-', '2', '-', '2', '3']),
+    ('15=7+0', ['1', '5', '7', '+', '0'])
 ])
 def test_extract_numbers_from_questions(question, expected):
     assert MatchGameSolver._extract_numbers_from_question(question) == expected
@@ -13,7 +14,8 @@ def test_extract_numbers_from_questions(question, expected):
 
 @pytest.mark.parametrize('question, expected', [
     ('1+2=3', '{}{}{}={}'),
-    ('1-2-2=3', '{}{}{}{}{}={}')
+    ('1-2-2=3', '{}{}{}{}{}={}'),
+    ('15=7+0', '{}{}={}{}{}')
 ])
 def test_replace_with_curly_brace(question, expected):
     assert MatchGameSolver._replace_with_curly_brace(question) == expected
@@ -27,10 +29,21 @@ def test_get_question_and_key(question, expected):
     assert MatchGameSolver._get_question_and_key(question) == expected
 
 
+@pytest.mark.parametrize('expression, expected', [
+    ('1+2=4', False),
+    ('100-2+101=199', True),
+    #  ('a + b = c', False),
+    ('100 - 2 = 98', True)
+])
+def test_judge_expression(expression, expected):
+    assert MatchGameSolver._judge_expression(expression) == expected
+
+
 @pytest.mark.parametrize('question, num_moves, mode, expected', [
     ('1+4=11', 1, '+', {'7+4=11'}),
-    ('15=1+0', 1, '+', {'15=7+8'})
+    ('15=7+0', 1, '+', {'15=7+8'}),
+    ('7+0=15', 1, '+', {'7+8=15'})
 ])
 def test_solve_for_add_one(question, num_moves, mode, expected):
     match_game_solver = MatchGameSolver(question, num_moves, mode)
-    match_game_solver._solve_for_add_one(question)
+    assert match_game_solver._solve_for_add_one(question) == expected
