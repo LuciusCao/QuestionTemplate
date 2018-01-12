@@ -9,7 +9,7 @@ from QTemplate.solver.match_game_solver import MatchGameSolver
     ('15=7+0', ['1', '5', '7', '+', '0'])
 ])
 def test_extract_numbers_from_questions(question, expected):
-    assert MatchGameSolver._extract_numbers_from_question(question) == expected
+    assert MatchGameSolver._extract_numbers(question) == expected
 
 
 @pytest.mark.parametrize('question, expected', [
@@ -44,6 +44,6 @@ def test_judge_expression(expression, expected):
     ('15=7+0', 1, '+', {'15=7+8'}),
     ('7+0=15', 1, '+', {'7+8=15'})
 ])
-def test_solve_for_add_one(question, num_moves, mode, expected):
+def test_solve(question, num_moves, mode, expected):
     match_game_solver = MatchGameSolver(question, num_moves, mode)
-    assert match_game_solver._solve_for_add_one(question) == expected
+    assert match_game_solver.solve() == expected

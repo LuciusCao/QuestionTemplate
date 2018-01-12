@@ -7,6 +7,37 @@ class MatchGameSolver:
         self.num_moves = num_moves
         self.mode = mode
 
+        if mode == '+':
+
+            if num_moves == 1:
+                self._cmd = 'add_one'
+            elif num_moves == 2:
+                self._cmd == 'add_two'
+            else:
+                raise Exception('数字只允许1和2')
+
+        elif mode == '-':
+
+            if num_moves == 1:
+                self._cmd = 'remove_one'
+            elif num_moves == 2:
+                self._cmd = 'remove_two'
+            else:
+                raise Exception('数字只允许1和2')
+
+        elif mode == 'o':
+
+            if num_moves == 1:
+                self._cmd = 'self_one'
+            elif num_moves == 2:
+                self._cmd = 'self_two'
+            else:
+                raise Exception('数字只允许1和2')
+
+        else:
+
+            raise Exception('模式必须是+-o中的一个')
+
         self.lookup_table = {
             'add_one': {
                 '0': ('8',),
@@ -53,7 +84,7 @@ class MatchGameSolver:
         }
 
     @staticmethod
-    def _extract_numbers_from_question(question):
+    def _extract_numbers(question):
         return re.findall(r'[\d\+\-]', question)
 
     @staticmethod
@@ -75,16 +106,14 @@ class MatchGameSolver:
         else:
             return False
 
-    def _solve_for_add_one(self, question):
-        expr = MatchGameSolver._replace_with_curly_brace(question)
-        digit_list = MatchGameSolver._extract_numbers_from_question(question)
+    def _solve_for_add_one(self, expr, digit_list, cmd):
         solutions = set()
         length = len(digit_list)
 
         for i in range(length):
             digit = digit_list[i]
             try:
-                possible_moves = self.lookup_table['add_one'][digit]
+                possible_moves = self.lookup_table[cmd][digit]
                 for move in possible_moves:
                     new_digit_list = digit_list.copy()
                     new_digit_list[i] = move
@@ -97,8 +126,10 @@ class MatchGameSolver:
         return solutions
 
     def solve(self):
+        expr = MatchGameSolver._replace_with_curly_brace(self.question)
+        digit_list = MatchGameSolver._extract_numbers(self.question)
         if self.mode == '+' and self.num_moves == 1:
-            solutions = self._solve_for_add_one(self.question)
+            solutions = self._solve_for_add_one(expr, digit_list, self._cmd)
         return solutions
 
     def output(self):
