@@ -1,5 +1,5 @@
 import re
-import itertools
+from itertools import permutations, product
 
 
 class MatchGameSolver:
@@ -14,27 +14,29 @@ class MatchGameSolver:
         if mode == '+':
 
             if num_moves == 1:
-                self._cmd = 'add_one'
+                self._cmd = [['add_one']]
             elif num_moves == 2:
-                self._cmd == 'add_two'
+                self._cmd == [['add_two'], ['add_one', 'add_one']]
             else:
                 raise Exception('数字只允许1和2')
 
         elif mode == '-':
 
             if num_moves == 1:
-                self._cmd = 'remove_one'
+                self._cmd = [['remove_one']]
             elif num_moves == 2:
-                self._cmd = 'remove_two'
+                self._cmd = [['remove_two'], ['remove_one', 'remove_one']]
             else:
                 raise Exception('数字只允许1和2')
 
         elif mode == 'o':
 
             if num_moves == 1:
-                self._cmd = 'self_one'
+                self._cmd = [['remove_one', 'add_one'],
+                             ['add_one', 'remove_one']]
             elif num_moves == 2:
-                self._cmd = 'self_two'
+                raise Exception('先不考虑移动两根')
+                self._cmd = [['self_two']]
             else:
                 raise Exception('数字只允许1和2')
 
@@ -107,38 +109,54 @@ class MatchGameSolver:
             return False
 
     @staticmethod
-    def _solve_for_move_in_one_digit(lookup_table, expr, digits, cmd):
+    def _get_possibilities(pos_info, temp_store, digits):
+        temp = product(*temp_store, repeat=1)
+        result = set()
+        for i, t in enumerate(temp):
+            new_digits = digits.copy()
+            for j, each_pos in enumerate(pos_info):
+                new_digits[each_pos] = t[j]
+            result.add(tuple(new_digits))
+        return result
+
+    @staticmethod
+    def _solve(lookup_table, expr, digits, cmd):
         solutions = set()
 
-        for i, digit in enumerate(digits):
-            try:
-                possible_moves = lookup_table[cmd][digit]
-                for move in possible_moves:
-                    new_digit_list = digits.copy()
-                    new_digit_list[i] = move
-                    new_expr = expr.format(*new_digit_list)
+        for each_cmd in cmd:
+            num_steps = len(each_cmd)
+            num_digits = len(digits)
+            move_positions = permutations(range(num_digits), num_steps)
+            for position_combo in move_positions:
+                temp_store = [[] for i in range(num_steps)]
+                pos_info = []
+                for i, each_pos in enumerate(position_combo):
+                    pos_info.append(each_pos)
+                    try:
+                        step = each_cmd[i]
+                        digit = digits[each_pos]
+                        possible_moves = lookup_table[step][digit]
+                        for move in possible_moves:
+                            temp_store[i].append(move)
+                    except KeyError:
+                        pass
+                possibilities = MatchGameSolver._get_possibilities(pos_info,
+                                                                   temp_store,
+                                                                   digits)
+                for posibility in possibilities:
+                    new_expr = expr.format(*posibility)
                     if MatchGameSolver._judge_expression(new_expr):
                         solutions.add(new_expr)
-            except KeyError:
-                pass
 
         return solutions
 
-    @staticmethod
-    def _solve_for_two_moves(lookup_table, expr, digits, cmd):
-        solutions = set()
-
-        possible_comb = itertools.combinations(range(len(digits)), 2)
-
     def solve(self):
         solutions = set()
-        if self._cmd in ('add_one', 'remove_one'):
-            solution = MatchGameSolver._solve_for_move_in_one_digit(
-                self.lookup_table,
-                self.expr,
-                self.digits,
-                self._cmd)
-            solutions = solutions.union(solution)
+        solution = MatchGameSolver._solve(self.lookup_table,
+                                          self.expr,
+                                          self.digits,
+                                          self._cmd)
+        solutions = solutions.union(solution)
         return solutions
 
     def output(self):
