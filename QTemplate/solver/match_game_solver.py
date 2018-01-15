@@ -6,7 +6,10 @@ class MatchGameSolver:
         self.question = question
         self.num_moves = num_moves
         self.mode = mode
+        self.expr = MatchGameSolver._replace_with_curly_brace(self.question)
+        self.digits = MatchGameSolver._extract_numbers(self.question)
 
+        # dirty code below, should be cleaned someday
         if mode == '+':
 
             if num_moves == 1:
@@ -106,16 +109,15 @@ class MatchGameSolver:
         else:
             return False
 
-    def _solve_for_add_one(self, expr, digit_list, cmd):
+    @staticmethod
+    def _solve_for_one_move(lookup_table, expr, digits, cmd):
         solutions = set()
-        length = len(digit_list)
 
-        for i in range(length):
-            digit = digit_list[i]
+        for i, digit in enumerate(digits):
             try:
-                possible_moves = self.lookup_table[cmd][digit]
+                possible_moves = lookup_table[cmd][digit]
                 for move in possible_moves:
-                    new_digit_list = digit_list.copy()
+                    new_digit_list = digits.copy()
                     new_digit_list[i] = move
                     new_expr = expr.format(*new_digit_list)
                     if MatchGameSolver._judge_expression(new_expr):
@@ -126,10 +128,13 @@ class MatchGameSolver:
         return solutions
 
     def solve(self):
-        expr = MatchGameSolver._replace_with_curly_brace(self.question)
-        digit_list = MatchGameSolver._extract_numbers(self.question)
-        if self.mode == '+' and self.num_moves == 1:
-            solutions = self._solve_for_add_one(expr, digit_list, self._cmd)
+        solutions = set()
+        if self.num_moves == 1:
+            solution = MatchGameSolver._solve_for_one_move(self.lookup_table,
+                                                           self.expr,
+                                                           self.digits,
+                                                           self._cmd)
+            solutions = solutions.union(solution)
         return solutions
 
     def output(self):
