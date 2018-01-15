@@ -54,21 +54,20 @@ class OperandSolver:
     @staticmethod
     def _fix_sign(sign_list):
         fixed_sign_list = sign_list.copy()
-        l = len(sign_list)
         reverse = False
-        for i in range(l):
-            if sign_list[i] == '(':
+        for i, sign in enumerate(sign_list):
+            if sign == '(':
                 try:
                     if sign_list[i-1] == '-':
                         reverse = True
                 except IndexError:
                     pass
-            elif sign_list[i] == ')':
+            elif sign == ')':
                 reverse = False
             elif reverse is True:
-                if sign_list[i] == '+':
+                if sign == '+':
                     fixed_sign_list[i] = '-'
-                elif sign_list[i] == '-':
+                elif sign == '-':
                     fixed_sign_list[i] = '+'
                 else:
                     raise Exception('奇怪的异常！')
@@ -82,6 +81,14 @@ class OperandSolver:
         return expr_wo_symbol.format(*fixed_sign_list)
 
     @staticmethod
+    def _parenthesis_validation(expr):
+        result = re.findall(r'\(', expr)
+        if len(result) <= 1:
+            return True
+        else:
+            return False
+
+    @staticmethod
     def _solver(formula, ops, target):
         expressions = set()
         num_blanks = len(re.findall(r'{}', formula))
@@ -92,9 +99,11 @@ class OperandSolver:
             expr = OperandSolver._sign_fixer(expr)
 
             try:
-                if eval(expr) == target:
-                    if OperandSolver._expr_validation(expr):
-                        expressions.add(expr)
+                valid_result = eval(expr) == target
+                valid_expr = OperandSolver._expr_validation(expr)
+                valid_parenthesis = OperandSolver._parenthesis_validation(expr)
+                if valid_result and valid_expr and valid_parenthesis:
+                    expressions.add(expr)
             except Exception:
                 pass
 
