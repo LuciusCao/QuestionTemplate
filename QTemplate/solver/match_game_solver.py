@@ -16,7 +16,7 @@ class MatchGameSolver:
             if num_moves == 1:
                 self._cmd = [['add_one']]
             elif num_moves == 2:
-                self._cmd == [['add_two'], ['add_one', 'add_one']]
+                self._cmd = [['add_two'], ['add_one', 'add_one']]
             else:
                 raise Exception('数字只允许1和2')
 
@@ -32,11 +32,14 @@ class MatchGameSolver:
         elif mode == 'o':
 
             if num_moves == 1:
-                self._cmd = [['remove_one', 'add_one'],
+                self._cmd = [['self_one'],
+                             ['remove_one', 'add_one'],
                              ['add_one', 'remove_one']]
             elif num_moves == 2:
-                raise Exception('先不考虑移动两根')
-                self._cmd = [['self_two']]
+                raise Exception('暂时不考虑移动两根')
+                self._cmd = [['self_two'],
+                             ['remove_one', 'remove_one', 'add_one', 'add_one'],
+                             ['remove_one', 'add_one', 'remove_one', 'add_one']]
             else:
                 raise Exception('数字只允许1和2')
 
