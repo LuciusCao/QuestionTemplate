@@ -1,4 +1,5 @@
 import re
+import itertools
 
 
 class MatchGameSolver:
@@ -95,12 +96,8 @@ class MatchGameSolver:
         return re.subn(r'[\d\+\-]', '{}', question)[0]
 
     @staticmethod
-    def _get_question_and_key(question):
-        return question.split('=')
-
-    @staticmethod
     def _judge_expression(expr):
-        splited = MatchGameSolver._get_question_and_key(expr)
+        splited = expr.split('=')
         left = splited[0]
         right = splited[1]
 
@@ -110,7 +107,7 @@ class MatchGameSolver:
             return False
 
     @staticmethod
-    def _solve_for_one_move(lookup_table, expr, digits, cmd):
+    def _solve_for_move_in_one_digit(lookup_table, expr, digits, cmd):
         solutions = set()
 
         for i, digit in enumerate(digits):
@@ -127,13 +124,20 @@ class MatchGameSolver:
 
         return solutions
 
+    @staticmethod
+    def _solve_for_two_moves(lookup_table, expr, digits, cmd):
+        solutions = set()
+
+        possible_comb = itertools.combinations(range(len(digits)), 2)
+
     def solve(self):
         solutions = set()
-        if self.num_moves == 1:
-            solution = MatchGameSolver._solve_for_one_move(self.lookup_table,
-                                                           self.expr,
-                                                           self.digits,
-                                                           self._cmd)
+        if self._cmd in ('add_one', 'remove_one'):
+            solution = MatchGameSolver._solve_for_move_in_one_digit(
+                self.lookup_table,
+                self.expr,
+                self.digits,
+                self._cmd)
             solutions = solutions.union(solution)
         return solutions
 

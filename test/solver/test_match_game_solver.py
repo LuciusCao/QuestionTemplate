@@ -21,14 +21,6 @@ def test_replace_with_curly_brace(question, expected):
     assert MatchGameSolver._replace_with_curly_brace(question) == expected
 
 
-@pytest.mark.parametrize('question, expected', [
-    ('1+2=3', ['1+2', '3']),
-    ('1=3-2', ['1', '3-2'])
-])
-def test_get_question_and_key(question, expected):
-    assert MatchGameSolver._get_question_and_key(question) == expected
-
-
 @pytest.mark.parametrize('expression, expected', [
     ('1+2=4', False),
     ('100-2+101=199', True),
