@@ -45,7 +45,8 @@ class MatchGameSolver:
                     ['add_one', 'remove_one', 'add_one', 'remove_one'],
                     ['add_one', 'remove_one', 'remove_one', 'add_one'],
                     ['add_two', 'remove_two'],
-                    ['remove_two', 'add_two']
+                    ['remove_two', 'add_two'],
+                    ['self_one', 'self_one']
                 ]
             else:
                 raise Exception('数字只允许1和2')
