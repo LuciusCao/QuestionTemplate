@@ -114,10 +114,16 @@ class MatchGameSolver:
         left = splited[0]
         right = splited[1]
 
-        if eval(left) == eval(right):
-            return True
-        else:
-            return False
+        try:
+            left_side = eval(left)
+            right_side = eval(right)
+
+            if left_side == right_side:
+                return True
+            else:
+                return False
+        except SyntaxError:
+            pass
 
     @staticmethod
     def _get_possibilities(pos_info, temp_store, digits):
