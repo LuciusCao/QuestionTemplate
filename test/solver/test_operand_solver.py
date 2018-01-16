@@ -66,7 +66,9 @@ def test_single_number_validation(test_input, expected):
     ('(1+2)', True),
     ('1+(2+3)', True),
     ('(1+(2+3)+4)', False),
-    ('1+2+2', True)
+    ('1+2+2', True),
+    ('(1+(2)', False),
+    ('(1+2))', False)
 ])
 def test_parenthesis_number_validation(expr, expected):
     assert OperandSolver._parenthesis_number_validation(expr) == expected

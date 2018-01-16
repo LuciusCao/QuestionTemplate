@@ -45,8 +45,9 @@ class OperandSolver:
 
     @staticmethod
     def _parenthesis_number_validation(expr):
-        result = re.findall(r'\(', expr)
-        if len(result) <= 1:
+        num_left = re.findall(r'\(', expr)
+        num_right = re.findall(r'\)', expr)
+        if len(num_left) <= 1 and len(num_right) <= 1:
             return True
         else:
             return False
@@ -126,7 +127,7 @@ class OperandSolver:
                     if eval(expr) == target:
                         expressions.add(expr)
                 except Exception:
-                    pass
+                    print(expr)
 
         return expressions
 
