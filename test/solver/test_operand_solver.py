@@ -87,29 +87,39 @@ def test_parenthesis_validation(expr, expected):
 @pytest.mark.parametrize('formula, ops, target, expected', [
     ('1{}2', {'+', '-', ''}, 3, {'1+2'}),
     ('1{}2{}3', {'+', '-', ''}, 9, {'12-3'}),
-    ('{}1{}+{}2{}+{}3{}', {'(', ')', ''}, 6, {'1+2+3', '(1+2)+3',
-                                              '1+(2+3)', '(1+2+3)'}),
-    ('{}1{}+{}2{}+{}3{}+{}4{}', {'(', ')', ''}, 10, {'1+2+3+4', '(1+2+3+4)',
-                                                     '(1+2)+3+4', '(1+2+3)+4',
-                                                     '1+(2+3)+4', '1+(2+3+4)',
-                                                     '1+2+(3+4)'})
 ])
-def test_solver(formula, ops, target, expected):
-    assert OperandSolver._solver(formula, ops, target) == expected
+def test_solver_wo_parenthesis(formula, ops, target, expected):
+    result = OperandSolver._solver_wo_parenthesis(formula, ops, target)
+    assert result == expected
 
 
-@pytest.mark.parametrize('test_input, expected', [
-    (([1, 2, 3], 6, False, False), {'1+2+3'}),
-    (([1, 2, 3], 15, True, False), {'12+3'}),
-    (([1, 2, 3], 9, False, False), set()),
-    (([1, 2, 3], 9, True, False), {'12-3'}),
-    (([1, 2], 3, True, True), {'1+2', '(1+2)'})
+@pytest.mark.parametrize('formula, target, expected', [
+    ('{}1{}+{}2{}+{}3{}', 6, {'(1+2)+3', '1+(2+3)', '(1+2+3)'}),
+    ('{}1{}+{}2{}+{}3{}+{}4{}', 10, {'(1+2+3+4)', '(1+2)+3+4', '(1+2+3)+4',
+                                     '1+(2+3)+4', '1+(2+3+4)', '1+2+(3+4)'})
 ])
-def test_solve(test_input, expected):
-    op_solver = OperandSolver(numbers=test_input[0],
-                              target=test_input[1],
-                              allow_empty=test_input[2],
-                              use_parenthesis=test_input[3])
+def test_solver_for_parenthesis(formula, target, expected):
+    assert OperandSolver._solver_for_parenthesis(formula, target) == expected
+
+
+@pytest.mark.parametrize('numbers, target, allow_empty, use_paren, expected', [
+    ([1, 2, 3], 6, False, False, {'1+2+3'}),
+    ([1, 2, 3], 15, True, False, {'12+3'}),
+    ([1, 2, 3], 9, False, False, set()),
+    ([1, 2, 3], 9, True, False, {'12-3'}),
+    ([1, 2], 3, True, True, {'1+2', '(1+2)'}),
+    ([1, 2, 3], 6, True, True, {'1+2+3', '(1+2)+3',
+                                '1+(2+3)', '(1+2+3)'}),
+    ([1, 2, 3, 4], 10, True, True, {'1+2+3+4', '(1+2+3+4)',
+                                    '(1+2)+3+4', '(1+2+3)+4',
+                                    '1+(2+3)+4', '1+(2+3+4)',
+                                    '1+2+(3+4)'})
+])
+def test_solve(numbers, target, allow_empty, use_paren, expected):
+    op_solver = OperandSolver(numbers=numbers,
+                              target=target,
+                              allow_empty=allow_empty,
+                              use_parenthesis=use_paren)
     assert op_solver.solve() == expected
 
 
