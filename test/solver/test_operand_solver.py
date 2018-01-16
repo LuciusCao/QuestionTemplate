@@ -58,8 +58,8 @@ def test_convert_data_fail():
     ('()', False),
     ('(45-(20)+8)', False)
 ])
-def test_expr_validation(test_input, expected):
-    assert OperandSolver._expr_validation(test_input) == expected
+def test_single_number_validation(test_input, expected):
+    assert OperandSolver._single_number_validation(test_input) == expected
 
 
 @pytest.mark.parametrize('expr, expected', [
@@ -67,6 +67,16 @@ def test_expr_validation(test_input, expected):
     ('1+(2+3)', True),
     ('(1+(2+3)+4)', False),
     ('1+2+2', True)
+])
+def test_parenthesis_number_validation(expr, expected):
+    assert OperandSolver._parenthesis_number_validation(expr) == expected
+
+
+@pytest.mark.parametrize('expr, expected', [
+    (')1(', False),
+    (')1', False),
+    ('1(', False),
+    ('(1+2)', True)
 ])
 def test_parenthesis_validation(expr, expected):
     assert OperandSolver._parenthesis_validation(expr) == expected

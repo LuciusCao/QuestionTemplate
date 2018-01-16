@@ -44,9 +44,37 @@ class OperandSolver:
         return [OperandSolver._add_curly_brace_to_one(e) for e in expressions]
 
     @staticmethod
-    def _expr_validation(expr):
+    def _parenthesis_number_validation(expr):
+        result = re.findall(r'\(', expr)
+        if len(result) <= 1:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def _single_number_validation(expr):
         result = re.findall(r'\(\d*?\)', expr)
         if len(result) == 0:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def _parenthesis_validation(expr):
+        result_left = re.findall(r'\)\d+?', expr)
+        result_right = re.findall(r'\d+?\(', expr)
+        if len(result_left) == 0 and len(result_right) == 0:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def _expr_validation(expr):
+        paren_num_valid = OperandSolver._parenthesis_number_validation(expr)
+        single_num_valid = OperandSolver._single_number_validation(expr)
+        paren_valid = OperandSolver._parenthesis_validation(expr)
+
+        if paren_num_valid and single_num_valid and paren_valid:
             return True
         else:
             return False
@@ -81,14 +109,6 @@ class OperandSolver:
         return expr_wo_symbol.format(*fixed_sign_list)
 
     @staticmethod
-    def _parenthesis_validation(expr):
-        result = re.findall(r'\(', expr)
-        if len(result) <= 1:
-            return True
-        else:
-            return False
-
-    @staticmethod
     def _solver(formula, ops, target):
         expressions = set()
         num_blanks = len(re.findall(r'{}', formula))
@@ -96,16 +116,17 @@ class OperandSolver:
 
         for solution in possible_solutions:
             expr = formula.format(*solution)
-            expr = OperandSolver._sign_fixer(expr)
 
-            try:
-                valid_result = eval(expr) == target
-                valid_expr = OperandSolver._expr_validation(expr)
-                valid_parenthesis = OperandSolver._parenthesis_validation(expr)
-                if valid_result and valid_expr and valid_parenthesis:
-                    expressions.add(expr)
-            except Exception:
-                pass
+            valid_expr = OperandSolver._expr_validation(expr)
+
+            if valid_expr:
+                expr = OperandSolver._sign_fixer(expr)
+
+                try:
+                    if eval(expr) == target:
+                        expressions.add(expr)
+                except Exception:
+                    pass
 
         return expressions
 
