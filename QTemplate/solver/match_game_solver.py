@@ -36,10 +36,17 @@ class MatchGameSolver:
                              ['remove_one', 'add_one'],
                              ['add_one', 'remove_one']]
             elif num_moves == 2:
-                raise Exception('暂时不考虑移动两根')
-                self._cmd = [['self_two'],
-                             ['remove_one', 'remove_one', 'add_one', 'add_one'],
-                             ['remove_one', 'add_one', 'remove_one', 'add_one']]
+                self._cmd = [
+                    ['self_two'],
+                    ['remove_one', 'remove_one', 'add_one', 'add_one'],
+                    ['remove_one', 'add_one', 'remove_one', 'add_one'],
+                    ['remove_one', 'add_one', 'add_one', 'remove_one'],
+                    ['add_one', 'add_one', 'remove_one', 'remove_one'],
+                    ['add_one', 'remove_one', 'add_one', 'remove_one'],
+                    ['add_one', 'remove_one', 'remove_one', 'add_one'],
+                    ['add_two', 'remove_two'],
+                    ['remove_two', 'add_two']
+                ]
             else:
                 raise Exception('数字只允许1和2')
 
