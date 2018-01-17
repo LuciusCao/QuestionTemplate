@@ -6,12 +6,15 @@ The Goal is to quickly get some working examples, hence there would be only a ba
 
 ### Roadmap
 What I've done, what I'm working on, and where I'm heading over.
+
 ###### MVP
 - [x] A template resolver
 - [x] A DSL parser  
+
 ####### OM solver
 - [x] Operand solver
 - [x] Match Game solver  
+
 #######  continuous improvement (here is where we are)
 - [ ] integrate template, DSL parser and OM solver together
 - [ ] setup flask web env for web interface
