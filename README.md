@@ -11,10 +11,10 @@ What I've done, what I'm working on, and where I'm heading over.
 - [x] A template resolver
 - [x] A DSL parser  
 
-####### OM solver
+###### OM solver
 - [x] Operand solver
 - [x] Match Game solver  
 
-#######  continuous improvement (here is where we are)
+######  continuous improvement (here is where we are)
 - [ ] integrate template, DSL parser and OM solver together
 - [ ] setup flask web env for web interface
