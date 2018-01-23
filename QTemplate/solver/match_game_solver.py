@@ -123,8 +123,23 @@ class MatchGameSolver:
         except SyntaxError:
             pass
 
+    # the following two methods looks convoluted
     @staticmethod
     def _get_possibilities(pos_info, temp_store, digits):
+        '''
+        pos_info: 1-dim list which tells the position of the digit that is
+        going to be changed. E.g.
+            [0, 4] tells that within the digits ['1', '2', '+', '3', '8'], '1',
+            and '8' are going to be changed
+        temp_store: 2-dim list which is of the same length of a step of each
+        command; while the inner list is the possible moves that a specific
+        number can perform under a specific command. e.g.
+            [[1, 3], [2, 5]] meaning that '1' at 0-position can be changed to
+            1 or 3 while '8' at 4-position can be changed to 2 or 5.
+        digits: 1-dim list which record the exact number of the original
+        question. E.g.
+            ['1', '2', '+', '3', '8']
+        '''
         temp = product(*temp_store, repeat=1)
         result = set()
         for i, t in enumerate(temp):
