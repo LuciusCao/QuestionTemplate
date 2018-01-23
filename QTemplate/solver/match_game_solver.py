@@ -32,20 +32,18 @@ class MatchGameSolver:
         elif mode == 'o':
 
             if num_moves == 1:
-                self._cmd = [['self_one'],
-                             ['remove_one', 'add_one'],
-                             ['add_one', 'remove_one']]
+                self._cmd = [
+                    ['self_one'],
+                    ['add_one', 'remove_one']
+                ]
             elif num_moves == 2:
                 self._cmd = [
                     ['self_two'],
+                    ['add_one', 'add_one', 'remove_two'],
+                    ['add_one', 'remove_one', 'self_one'],
+                    ['remove_one', 'remove_one', 'add_two'],
                     ['remove_one', 'remove_one', 'add_one', 'add_one'],
-                    ['remove_one', 'add_one', 'remove_one', 'add_one'],
-                    ['remove_one', 'add_one', 'add_one', 'remove_one'],
-                    ['add_one', 'add_one', 'remove_one', 'remove_one'],
-                    ['add_one', 'remove_one', 'add_one', 'remove_one'],
-                    ['add_one', 'remove_one', 'remove_one', 'add_one'],
                     ['add_two', 'remove_two'],
-                    ['remove_two', 'add_two'],
                     ['self_one', 'self_one']
                 ]
             else:

@@ -53,7 +53,9 @@ def test_get_possibilites(pos_info, temp_store, digits, expected):
     ('3-6=4', 1, 'o', {'9-5=4'}),
     ('2+1=4', 1, 'o', {'3+1=4'}),
     ('23-4=31', 2, 'o', {'25-4=21', '35-4=31'}),
-    ('93-34=38', 2, 'o', {'92-34=58', '92-54=38'})
+    ('93-34=38', 2, 'o', {'92-34=58', '92-54=38'}),
+    ('3+16=23', 2, 'o', {'3+19=22', '9+18=27'}),
+    ('23=3+16', 2, 'o', {'22=3+19', '27=9+18'})
 ])
 def test_solve(question, num_moves, mode, expected):
     match_game_solver = MatchGameSolver(question, num_moves, mode)
