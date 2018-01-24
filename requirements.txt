@@ -4,7 +4,6 @@ bleach==2.1.2
 click==6.7
 decorator==4.2.1
 entrypoints==0.2.3
-Flask==0.12.2
 html5lib==1.0.1
 ipykernel==4.7.0
 ipython==6.2.1
@@ -12,13 +11,13 @@ ipython-genutils==0.2.0
 ipywidgets==7.1.0
 itsdangerous==0.24
 jedi==0.11.1
-Jinja2==2.10
 jsonschema==2.6.0
 jupyter==1.0.0
 jupyter-client==5.2.1
 jupyter-console==5.2.0
 jupyter-core==4.4.0
 lark-parser==0.5.2
+lxml==4.1.1
 MarkupSafe==1.0
 mistune==0.8.3
 nbconvert==5.3.1
@@ -35,6 +34,7 @@ py==1.5.2
 Pygments==2.2.0
 pytest==3.3.2
 python-dateutil==2.6.1
+python-docx==0.8.6
 pyzmq==16.0.3
 qtconsole==4.3.1
 Send2Trash==1.4.2
