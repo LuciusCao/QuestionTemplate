@@ -3,16 +3,21 @@ import pytest
 from QTemplate.solver.operand_solver import OperandSolver
 
 
-@pytest.mark.parametrize('test_input, expected', [
-    ((False, False), {'+', '-'}),
-    ((True, False), {'+', '-', ''}),
+@pytest.mark.parametrize('ops, empty, paren, expected', [
+    ({'+'}, False, False, {'+'}),
+    ({'+'}, True, False, {'+', ''}),
+    ({'+'}, False, True, {'+'}),
+    ({'*'}, True, True, {'*', ''}),
+    (None, False, False, {'+', '-', '*', '/'}),
+    (None, True, False, {'+', '-', '*', '/', ''}),
 ])
-def test_initialization(test_input, expected):
+def test_ops_initialization(ops, empty, paren, expected):
     op_solver = OperandSolver(numbers=[1, 2],
                               target=3,
-                              allow_empty=test_input[0],
-                              use_parenthesis=test_input[1])
-    assert op_solver.operands == expected
+                              ops=ops,
+                              allow_empty=empty,
+                              use_parenthesis=paren)
+    assert op_solver.ops == expected
 
 
 def test_initialization_fail_with_no_data():
@@ -102,29 +107,37 @@ def test_solver_for_parenthesis(formula, target, expected):
     assert OperandSolver._solver_for_parenthesis(formula, target) == expected
 
 
-@pytest.mark.parametrize('numbers, target, allow_empty, use_paren, expected', [
-    ([1, 2, 3], 6, False, False, {'1+2+3'}),
-    ([1, 2, 3], 15, True, False, {'12+3'}),
-    ([1, 2, 3], 9, False, False, set()),
-    ([1, 2, 3], 9, True, False, {'12-3'}),
-    ([1, 2], 3, True, True, {'1+2', '(1+2)'}),
-    ([1, 2, 3], 6, True, True, {'1+2+3', '(1+2)+3',
-                                '1+(2+3)', '(1+2+3)'}),
-    ([1, 2, 3, 4], 10, True, True, {'1+2+3+4', '(1+2+3+4)',
-                                    '(1+2)+3+4', '(1+2+3)+4',
-                                    '1+(2+3)+4', '1+(2+3+4)',
-                                    '1+2+(3+4)'})
+@pytest.mark.parametrize('numbers, target, ops, empty, paren, expected', [
+    ([1, 2, 3], 6, None, False, False, {'1+2+3', '1*2*3'}),
+    ([1, 2, 3], 15, {'+', '-'}, True, False, {'12+3'}),
+    ([1, 2, 3], 9, {'+', '-'}, False, False, set()),
+    ([1, 2, 3], 9, {'+', '-'}, True, False, {'12-3'}),
+    ([1, 2], 3, {'+', '-'}, True, True, {'1+2', '(1+2)'}),
+    ([1, 2, 3], 6, {'+', '-'}, True, True, {'1+2+3', '(1+2)+3',
+                                            '1+(2+3)', '(1+2+3)'}),
+    ([1, 2, 3, 4], 10, {'+', '-'}, True, True, {'1+2+3+4', '(1+2+3+4)',
+                                                '(1+2)+3+4', '(1+2+3)+4',
+                                                '1+(2+3)+4', '1+(2+3+4)',
+                                                '1+2+(3+4)'}),
+    ([1, 2, 3], 9, None, False, False, set()),
+    ([1, 2, 3], 9, None, False, True, {'(1+2)*3'}),
+    ([2, 2, 3], 12, None, False, False, {'2*2*3'}),
+    ([2, 4, 2], 4, None, False, False, {'2*4/2', '2+4-2', '2+4/2'}),
 ])
-def test_solve(numbers, target, allow_empty, use_paren, expected):
+def test_solve(numbers, target, ops, empty, paren, expected):
     op_solver = OperandSolver(numbers=numbers,
                               target=target,
-                              allow_empty=allow_empty,
-                              use_parenthesis=use_paren)
+                              ops=ops,
+                              allow_empty=empty,
+                              use_parenthesis=paren)
     assert op_solver.solve() == expected
 
 
 @pytest.mark.parametrize('sign_list, expected', [
     (['-', '(', '-', ')'], ['-', '(', '+', ')']),
+    (['-', '(', '+', ')'], ['-', '(', '-', ')']),
+    (['/', '(', '*', ')'], ['/', '(', '/', ')']),
+    (['/', '(', '/', ')'], ['/', '(', '*', ')']),
 ])
 def test_fix_sign(sign_list, expected):
     assert OperandSolver._fix_sign(sign_list) == expected

@@ -8,6 +8,7 @@ class OperandSolver:
                  numbers=None,
                  target=None,
                  allow_empty=False,
+                 ops=None,
                  use_parenthesis=False):
 
         if numbers is None or target is None:
@@ -18,9 +19,15 @@ class OperandSolver:
 
         self.use_parenthesis = use_parenthesis
 
-        self.operands = {'+', '-'}
+        if ops is None:
+            self.ops = {'+', '-', '*', '/'}
+        elif not ops.issubset({'+', '-', '*', '/'}):
+            raise Exception('公式符号必须为+-*/中的一部分')
+        else:
+            self.ops = ops
+
         if allow_empty is True:
-            self.operands.add('')
+            self.ops.add('')
 
         self.numbers = self._convert_data(numbers)
         self.target = target
@@ -81,13 +88,17 @@ class OperandSolver:
             return False
 
     @staticmethod
+    def _result_validation(exprs, target):
+        return (expr for expr in exprs if eval(expr) == target)
+
+    @staticmethod
     def _fix_sign(sign_list):
         fixed_sign_list = sign_list.copy()
         reverse = False
         for i, sign in enumerate(sign_list):
             if sign == '(':
                 try:
-                    if sign_list[i-1] == '-':
+                    if sign_list[i-1] in {'-', '/'}:
                         reverse = True
                 except IndexError:
                     pass
@@ -98,6 +109,10 @@ class OperandSolver:
                     fixed_sign_list[i] = '-'
                 elif sign == '-':
                     fixed_sign_list[i] = '+'
+                elif sign == '*':
+                    fixed_sign_list[i] = '/'
+                elif sign == '/':
+                    fixed_sign_list[i] = '*'
                 else:
                     raise Exception('奇怪的异常！')
         return fixed_sign_list
@@ -117,8 +132,9 @@ class OperandSolver:
 
         for solution in possible_solutions:
             expr = formula.format(*solution)
-            if eval(expr) == target:
-                expressions.add(expr)
+            #  if eval(expr) == target:
+                #  expressions.add(expr)
+            expressions.add(expr)
 
         return expressions
 
@@ -151,7 +167,7 @@ class OperandSolver:
     def solve(self):
         formula = '{}'.join(self.numbers)
         exprs = OperandSolver._solver_wo_parenthesis(formula,
-                                                     self.operands,
+                                                     self.ops,
                                                      self.target)
 
         if self.use_parenthesis is False:
