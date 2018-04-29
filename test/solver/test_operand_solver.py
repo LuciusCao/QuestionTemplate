@@ -89,22 +89,23 @@ def test_parenthesis_validation(expr, expected):
     assert OperandSolver._parenthesis_validation(expr) == expected
 
 
-@pytest.mark.parametrize('formula, ops, target, expected', [
-    ('1{}2', {'+', '-', ''}, 3, {'1+2'}),
-    ('1{}2{}3', {'+', '-', ''}, 9, {'12-3'}),
+@pytest.mark.parametrize('formula, ops, expected', [
+    ('1{}2', {'+', '-', ''}, {'1+2', '1-2', '12'}),
+    ('1{}2{}3', {'+', '-', ''}, {'12-3', '123', '1+2+3', '1-23', '1-2-3',
+                                 '1+2-3', '1-2+3', '1+23', '12+3'}),
 ])
-def test_solver_wo_parenthesis(formula, ops, target, expected):
-    result = OperandSolver._solver_wo_parenthesis(formula, ops, target)
+def test_filler_wo_parenthesis(formula, ops, expected):
+    result = OperandSolver._filler_wo_parenthesis(formula, ops)
     assert result == expected
 
 
-@pytest.mark.parametrize('formula, target, expected', [
-    ('{}1{}+{}2{}+{}3{}', 6, {'(1+2)+3', '1+(2+3)', '(1+2+3)'}),
-    ('{}1{}+{}2{}+{}3{}+{}4{}', 10, {'(1+2+3+4)', '(1+2)+3+4', '(1+2+3)+4',
-                                     '1+(2+3)+4', '1+(2+3+4)', '1+2+(3+4)'})
+@pytest.mark.parametrize('formula, expected', [
+    ('{}1{}+{}2{}+{}3{}', {'(1+2)+3', '1+(2+3)', '(1+2+3)'}),
+    ('{}1{}+{}2{}+{}3{}+{}4{}', {'(1+2+3+4)', '(1+2)+3+4', '(1+2+3)+4',
+                                 '1+(2+3)+4', '1+(2+3+4)', '1+2+(3+4)'})
 ])
-def test_solver_for_parenthesis(formula, target, expected):
-    assert OperandSolver._solver_for_parenthesis(formula, target) == expected
+def test_filler_for_parenthesis(formula, expected):
+    assert OperandSolver._filler_for_parenthesis(formula) == expected
 
 
 @pytest.mark.parametrize('numbers, target, ops, empty, paren, expected', [
@@ -141,3 +142,11 @@ def test_solve(numbers, target, ops, empty, paren, expected):
 ])
 def test_fix_sign(sign_list, expected):
     assert OperandSolver._fix_sign(sign_list) == expected
+
+
+@pytest.mark.parametrize('exprs, target, expected', [
+    (['1+1', '1+2'], 2, {'1+1'}),
+    (['2*2+2', '2+2+2', '2-2*2'], 6, {'2*2+2', '2+2+2'})
+])
+def test_result_validation(exprs, target, expected):
+    assert OperandSolver._result_validation(exprs, target) == expected

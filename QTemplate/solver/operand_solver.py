@@ -89,7 +89,7 @@ class OperandSolver:
 
     @staticmethod
     def _result_validation(exprs, target):
-        return (expr for expr in exprs if eval(expr) == target)
+        return {expr for expr in exprs if eval(expr) == target}
 
     @staticmethod
     def _fix_sign(sign_list):
@@ -125,21 +125,19 @@ class OperandSolver:
         return expr_wo_symbol.format(*fixed_sign_list)
 
     @staticmethod
-    def _solver_wo_parenthesis(formula, ops, target):
+    def _filler_wo_parenthesis(formula, ops):
         expressions = set()
         num_blanks = len(re.findall(r'{}', formula))
         possible_solutions = product(ops, repeat=num_blanks)
 
         for solution in possible_solutions:
             expr = formula.format(*solution)
-            #  if eval(expr) == target:
-                #  expressions.add(expr)
             expressions.add(expr)
 
         return expressions
 
     @staticmethod
-    def _solver_for_parenthesis(formula, target):
+    def _filler_for_parenthesis(formula):
         expressions = set()
         num_blanks = len(re.findall(r'{}', formula))
 
@@ -158,26 +156,22 @@ class OperandSolver:
 
             if valid_expr:
                 expr = OperandSolver._sign_fixer(expr)
-
-                if eval(expr) == target:
-                    expressions.add(expr)
+                expressions.add(expr)
 
         return expressions
 
     def solve(self):
         formula = '{}'.join(self.numbers)
-        exprs = OperandSolver._solver_wo_parenthesis(formula,
-                                                     self.ops,
-                                                     self.target)
+        exprs = OperandSolver._filler_wo_parenthesis(formula, self.ops)
 
         if self.use_parenthesis is False:
-            return exprs
+            exprs = exprs
         else:
             formulas = OperandSolver._add_curly_brace_to_all(exprs)
             for f in formulas:
-                paren = OperandSolver._solver_for_parenthesis(f, self.target)
+                paren = OperandSolver._filler_for_parenthesis(f)
                 exprs = exprs.union(paren)
-            return exprs
+        return OperandSolver._result_validation(exprs, self.target)
 
     def output(self):
         expressions = self.solve()
