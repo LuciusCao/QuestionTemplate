@@ -37,7 +37,9 @@ def test_initialization_fail_with_wrong_data(numbers, target):
 @pytest.mark.parametrize('test_input, expected', [
     ('6', '{}6{}'),
     ('1+2', '{}1{}+{}2{}'),
-    ('1+2-3', '{}1{}+{}2{}-{}3{}')
+    ('1+2-3', '{}1{}+{}2{}-{}3{}'),
+    ('1*2*3', '{}1{}*{}2{}*{}3{}'),
+    ('1*2-3', '{}1{}*{}2{}-{}3{}'),
 ])
 def test_add_curly_brace_to_one(test_input, expected):
     assert OperandSolver._add_curly_brace_to_one(test_input) == expected
@@ -61,7 +63,8 @@ def test_convert_data_fail():
     ('(1)+2', False),
     ('1+2', True),
     ('()', False),
-    ('(45-(20)+8)', False)
+    ('(45-(20)+8)', False),
+    ('(11+(12-32)-2)', True),
 ])
 def test_single_number_validation(test_input, expected):
     assert OperandSolver._single_number_validation(test_input) == expected
@@ -124,6 +127,8 @@ def test_filler_for_parenthesis(formula, expected):
     ([1, 2, 3], 9, None, False, True, {'(1+2)*3'}),
     ([2, 2, 3], 12, None, False, False, {'2*2*3'}),
     ([2, 4, 2], 4, None, False, False, {'2*4/2', '2+4-2', '2+4/2'}),
+    ([3, 7, 10, 10], 24, None, False, False, set()),
+    ([7, 3, 10, 10], 24, None, False, False, {'7-3+10+10'}),
 ])
 def test_solve(numbers, target, ops, empty, paren, expected):
     op_solver = OperandSolver(numbers=numbers,
