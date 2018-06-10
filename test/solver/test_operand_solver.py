@@ -92,10 +92,35 @@ def test_parenthesis_validation(expr, expected):
     assert OperandSolver._parenthesis_validation(expr) == expected
 
 
+@pytest.mark.parametrize('expr, expected', [
+    ('1/0', False),
+    ('1/2', True),
+    ('0/1', True),
+    ('3/(3-3)/3*3', False)
+])
+def test_division_by_zero_validation(expr, expected):
+    assert OperandSolver._division_by_zero_validation(expr) == expected
+
+
+@pytest.mark.parametrize('expr, expected', [
+    ('1/2', True),
+    ('3/(3-3)', False),
+    ('0/1', True),
+    ('1/0', False),
+    ('0/0', False),
+    ('(1+2)', True),
+    ('1(', False),
+    ('3*3+3/(3-3)', False),
+])
+def test_expr_validation(expr, expected):
+    assert OperandSolver._expr_validation(expr) == expected
+
+
 @pytest.mark.parametrize('formula, ops, expected', [
     ('1{}2', {'+', '-', ''}, {'1+2', '1-2', '12'}),
     ('1{}2{}3', {'+', '-', ''}, {'12-3', '123', '1+2+3', '1-23', '1-2-3',
                                  '1+2-3', '1-2+3', '1+23', '12+3'}),
+    ('1{}2', {'*', '/'}, {'1*2', '1/2'}),
 ])
 def test_filler_wo_parenthesis(formula, ops, expected):
     result = OperandSolver._filler_wo_parenthesis(formula, ops)
@@ -105,7 +130,8 @@ def test_filler_wo_parenthesis(formula, ops, expected):
 @pytest.mark.parametrize('formula, expected', [
     ('{}1{}+{}2{}+{}3{}', {'(1+2)+3', '1+(2+3)', '(1+2+3)'}),
     ('{}1{}+{}2{}+{}3{}+{}4{}', {'(1+2+3+4)', '(1+2)+3+4', '(1+2+3)+4',
-                                 '1+(2+3)+4', '1+(2+3+4)', '1+2+(3+4)'})
+                                 '1+(2+3)+4', '1+(2+3+4)', '1+2+(3+4)'}),
+    ('{}3{}/{}3{}-{}3{}', {'(3/3-3)', '(3/3)-3'}),
 ])
 def test_filler_for_parenthesis(formula, expected):
     assert OperandSolver._filler_for_parenthesis(formula) == expected
@@ -142,8 +168,14 @@ def test_solve(numbers, target, ops, empty, paren, expected):
 @pytest.mark.parametrize('sign_list, expected', [
     (['-', '(', '-', ')'], ['-', '(', '+', ')']),
     (['-', '(', '+', ')'], ['-', '(', '-', ')']),
+    (['-', '(', '*', ')'], ['-', '(', '*', ')']),
+    (['-', '(', '/', ')'], ['-', '(', '/', ')']),
     (['/', '(', '*', ')'], ['/', '(', '/', ')']),
     (['/', '(', '/', ')'], ['/', '(', '*', ')']),
+    (['/', '(', '+', ')'], ['/', '(', '+', ')']),
+    (['/', '(', '-', ')'], ['/', '(', '-', ')']),
+    (['(', '/', ')', '-'], ['(', '/', ')', '-']),
+    (['(', '/', ')', '*'], ['(', '/', ')', '*']),
 ])
 def test_fix_sign(sign_list, expected):
     assert OperandSolver._fix_sign(sign_list) == expected

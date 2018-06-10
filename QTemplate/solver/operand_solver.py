@@ -77,44 +77,72 @@ class OperandSolver:
             return False
 
     @staticmethod
+    def _division_by_zero_validation(expr):
+        try:
+            eval(expr)
+        except ZeroDivisionError:
+            return False
+        except Exception:
+            return False
+        else:
+            return True
+
+    @staticmethod
     def _expr_validation(expr):
         paren_num_valid = OperandSolver._parenthesis_number_validation(expr)
         single_num_valid = OperandSolver._single_number_validation(expr)
         paren_valid = OperandSolver._parenthesis_validation(expr)
+        calc_valid = OperandSolver._division_by_zero_validation(expr)
 
-        if paren_num_valid and single_num_valid and paren_valid:
+        expr_valid = paren_num_valid and single_num_valid and paren_valid
+
+        if expr_valid and calc_valid:
             return True
         else:
             return False
 
     @staticmethod
     def _result_validation(exprs, target):
+        for expr in exprs:
+            try:
+                eval(expr)
+            except ZeroDivisionError:
+                print(expr)
+                break
         return {expr for expr in exprs if eval(expr) == target}
 
     @staticmethod
     def _fix_sign(sign_list):
         fixed_sign_list = sign_list.copy()
-        reverse = False
+        reverse = {'add_sub': False, 'mul_div': False}
+
         for i, sign in enumerate(sign_list):
+            cur_sign = sign
+
+            if i == 0:
+                prev_sign = ''
+            else:
+                prev_sign = sign_list[i-1]
+
             if sign == '(':
-                try:
-                    if sign_list[i-1] in {'-', '/'}:
-                        reverse = True
-                except IndexError:
-                    pass
+                if prev_sign == '-':
+                    reverse['add_sub'] = True
+                elif prev_sign == '/':
+                    reverse['mul_div'] = True
             elif sign == ')':
-                reverse = False
-            elif reverse is True:
-                if sign == '+':
-                    fixed_sign_list[i] = '-'
-                elif sign == '-':
+                reverse['add_sub'] = False
+                reverse['mul_div'] = False
+            elif reverse['add_sub'] == True:
+                if cur_sign == '-':
                     fixed_sign_list[i] = '+'
-                elif sign == '*':
+                elif cur_sign == '+':
+                    fixed_sign_list[i] = '-'
+            elif reverse['mul_div'] == True:
+                if cur_sign == '*':
                     fixed_sign_list[i] = '/'
-                elif sign == '/':
+                elif cur_sign == '/':
                     fixed_sign_list[i] = '*'
-                else:
-                    raise Exception('奇怪的异常！')
+
         return fixed_sign_list
 
     @staticmethod
