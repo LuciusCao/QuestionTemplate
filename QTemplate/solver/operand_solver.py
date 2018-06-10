@@ -4,6 +4,34 @@ from itertools import product
 
 
 class OperandSolver:
+    '''
+    Description:
+        Operand solver for Olympic math problems, supported operands: + - * /.
+        Given numbers and target, test takers are required to find the proper
+        combination of operands that makes the equation holds
+        numbers: list of int
+        target: int
+        allow_empty: boolean, if True, [1,1] can be considered as 11, in fact,
+        an empty string '' will be added to self.ops
+        ops: set of operands, specify a subset for certain type of questions
+        use_parenthesis: boolean, if True, the answer will include ONLY ONE
+        pair of parenthesis
+
+    Usage:
+        solver = OperandSolver(numbers=[1,1], target=2)
+        solver.solve()
+
+    Documentation:
+        |> add {} to numbers, [1, 2, 3] -> 1{}2{}3
+        |> enumerate all possible combinations
+        |> based on each combination in possible expression add {} to
+           expression, 1+2+3 -> {}1{}+{}2{}+{}3{}
+        |> enumerate all possible combinations of parenthesis. skipped if
+           use_parenthesis is False
+        |> check validation of expressions
+        |> fix sign of all expressions
+        |> use expressions that make the equation hold
+    '''
     def __init__(self,
                  numbers=None,
                  target=None,
@@ -103,12 +131,6 @@ class OperandSolver:
 
     @staticmethod
     def _result_validation(exprs, target):
-        for expr in exprs:
-            try:
-                eval(expr)
-            except ZeroDivisionError:
-                print(expr)
-                break
         return {expr for expr in exprs if eval(expr) == target}
 
     @staticmethod
