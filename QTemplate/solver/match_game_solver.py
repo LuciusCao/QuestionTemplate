@@ -1,5 +1,8 @@
 import re
+
+
 from itertools import permutations, product
+from QTemplate.solver.solver import Solver
 
 
 class MatchGameSolver:
@@ -188,7 +191,3 @@ class MatchGameSolver:
                                           self._cmd)
         solutions = solutions.union(solution)
         return solutions
-
-    def output(self):
-        solutions = self.solve()
-        print(' | '.join(solutions))
