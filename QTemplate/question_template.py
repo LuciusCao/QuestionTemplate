@@ -1,6 +1,14 @@
 import re
 
+
 from QTemplate.parser import run_command
+from QTemplate.utils import (
+    parse_template,
+    extract_var_expressions,
+    get_expressions_to_eval,
+    evaluate_expressions,
+    inject_data_to_template,
+)
 
 
 class QuestionTemplate:
@@ -23,15 +31,15 @@ class QuestionTemplate:
         self.variables = var
 
     def generate(self):
-        self.body = self._inject_data_to_template(self.__body_raw)
-        self.hint = self._inject_data_to_template(self.__hint_raw)
-        self.key = self._inject_data_to_template(self.__key_raw)
-        self.explanation = self._inject_data_to_template(self.__explanation_raw)
+        self.body = self.generate_piece(self.__body_raw)
+        self.hint = self.generate_piece(self.__hint_raw)
+        self.key = self.generate_piece(self.__key_raw)
+        self.explanation = self.generate_piece(self.__explanation_raw)
 
         if self.template == '选择题':
             self.choices = self.__choices_raw.copy()
             for k, v in self.choices.items():
-                self.choices[k] = self._inject_data_to_template(v)
+                self.choices[k] = self.generate_piece(v)
 
         print(self.body)
         print(self.hint)
@@ -44,34 +52,13 @@ class QuestionTemplate:
     def _generate_variables(self):
         variables = self.__variables_raw.copy()
         for var_name, rule in variables.items():
-            variables[var_name] = self._parse_rule(rule)
+            variables[var_name] = run_command(rule)
         return variables
 
-    @staticmethod
-    def _parse_rule(rule):
-        return run_command(rule)
-
-    def _inject_data_to_template(self, content):
-        expressions = self._parse_expressions(content)
-        template_wo_data = self._parse_template(content)
-        calced_expressions = self._eval_expressions(expressions)
-        template_with_data = template_wo_data.format(*calced_expressions)
+    def generate_piece(self, content):
+        var_expressions = extract_var_expression(content)
+        template = parse_template(content)
+        expressions = get_expressions_to_eval(self.variables)
+        data = evaluate_expressions(expressions)
+        result = template.format(*calced_expressions)
         return template_with_data
-
-    @staticmethod
-    def _parse_expressions(content):
-        pattern = r'(?<=<)[^<]+?(?=>)'
-        return re.findall(pattern, content)
-
-    @staticmethod
-    def _parse_template(content):
-        pattern = r'<[^<]+?>'
-        replacement = '{}'
-        return re.sub(pattern, replacement, content)
-
-    def _eval_expressions(self, exprs):
-        var_name = list(self.__variables_raw.keys())
-        for v in var_name:
-            exprs = [re.sub(v, str(self.variables[v]), e) for e in exprs]
-        result = [eval(e) for e in exprs]
-        return result

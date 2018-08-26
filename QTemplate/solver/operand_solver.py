@@ -1,9 +1,11 @@
 import re
 
+
 from itertools import product
+from QTemplate.solver.solver import Solver
 
 
-class OperandSolver:
+class OperandSolver(Solver):
     '''
     Description:
         Operand solver for Olympic math problems, supported operands: + - * /.
@@ -222,7 +224,3 @@ class OperandSolver:
                 paren = OperandSolver._filler_for_parenthesis(f)
                 exprs = exprs.union(paren)
         return OperandSolver._result_validation(exprs, self.target)
-
-    def output(self):
-        expressions = self.solve()
-        print(' | '.join(expressions))
