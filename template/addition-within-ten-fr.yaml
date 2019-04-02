@@ -1,0 +1,8 @@
+type: free response
+content: <x> + <y> = ?
+key: <x+y>
+variables:
+  x: 整数 1 10
+  y: 整数 1 10
+constraints:
+  - <x+y> <= 10

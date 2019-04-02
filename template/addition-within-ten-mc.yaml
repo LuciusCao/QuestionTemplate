@@ -1,0 +1,14 @@
+type: multiple choices
+content: <x> + <y> = ?
+choices:
+  - <x+y>
+  - <x*y>
+  - <x*2>
+  - <y*2>
+  - None of the above
+key: <x+y>
+variables:
+  x: 整数 1 10
+  y: 整数 1 10
+constraints:
+  - <x+y> <= 10
